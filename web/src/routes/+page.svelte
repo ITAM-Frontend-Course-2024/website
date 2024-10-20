@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { PUBLIC_GITHUB_ORGANIZATION as org } from "$env/static/public";
 	import type { Selectable } from "kysely";
 	import type { Group } from "$lib/server/db.types";
 	import LoadButton from "./LoadButton.svelte";
+	import { org } from "$lib";
 
 	let { data } = $props();
 

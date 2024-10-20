@@ -1,7 +1,7 @@
-import { PUBLIC_GITHUB_ORGANIZATION as org } from "$env/static/public";
 import { randomUUID } from "crypto";
 import { octokit } from ".";
 import db from "../db";
+import { org } from "$lib";
 
 const timeout = 500;
 
