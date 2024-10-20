@@ -1,0 +1,56 @@
+services:
+  gateway:
+    image: caddy:2.8-alpine
+    ports: [80:80, 443:443]
+    cap_add: [NET_ADMIN]
+    restart: unless-stopped
+    env_file: [.env]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  web:
+    image: ghcr.io/clayenkitten/itam-frontend-website:${DEPLOY_TAG}
+    build: ./web
+    init: true
+    expose: [3000]
+    restart: unless-stopped
+    env_file: [.env]
+
+  db:
+    image: postgres:16
+    expose: [5432]
+    shm_size: 128mb
+    restart: unless-stopped
+    env_file: [.env]
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  dbgate:
+    image: dbgate/dbgate:5.3.1-alpine
+    expose: [3000]
+    restart: unless-stopped
+    env_file: [.env]
+    environment:
+      CONNECTIONS: itam-frontend-website
+      SIGNLE_CONNECTION: itam-frontend-website
+      SINGLE_DATABASE: ${POSTGRES_DB}
+
+      LABEL_itam-frontend-website: itam-frontend-website
+      SERVER_itam-frontend-website: db
+      DATABASE_itam-frontend-website: ${POSTGRES_DB}
+      USER_itam-frontend-website: ${POSTGRES_USER}
+      PASSWORD_itam-frontend-website: ${POSTGRES_PASSWORD}
+      PORT_itam-frontend-website: 5432
+      ENGINE_itam-frontend-website: postgres@dbgate-plugin-postgres
+
+      WEB_ROOT: "/db"
+    volumes:
+      - dbgate:/root/.dbgate
+
+volumes:
+  caddy_data:
+  caddy_config:
+  db:
+  dbgate:
