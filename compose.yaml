@@ -20,10 +20,17 @@ services:
     restart: unless-stopped
     env_file: [.env]
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:3000/healthz || exit 1"] 
-      interval: 5s
+      test: ["CMD", "curl", "--no-progress-meter", "--fail", "http://localhost:3000/healthz"]
+      interval: 15s
       timeout: 5s
-      retries: 5
+      retries: 3
+      start_interval: 5s
+      start_period: 15s
+    depends_on:
+      db:
+        condition: service_healthy
+      init-db:
+        condition: service_completed_successfully
 
   # Primary PostgreSQL database
   db:
@@ -35,11 +42,12 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-d", "db_prod"]
-      interval: 5s
+      test: ["CMD", "pg_isready", "-U", "$POSTGRES_USER", "-d", "$POSTGRES_DB"]
+      interval: 30s
       timeout: 5s
-      retries: 5
-      start_period: 30s
+      retries: 3
+      start_interval: 5s
+      start_period: 15s
 
   # Database migrations
   init-db:
