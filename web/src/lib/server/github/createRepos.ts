@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { octokit } from ".";
 import db from "../db";
-import { org } from "$lib";
+import { org } from "$lib/config";
 
 /* Timeout between API invocations. */
 const timeout = 500;

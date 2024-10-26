@@ -2,7 +2,7 @@
 	import type { Selectable } from "kysely";
 	import type { Group } from "$lib/server/db.types";
 	import LoadButton from "./LoadButton.svelte";
-	import { org } from "$lib";
+	import { enabledFeatures, org } from "$lib/config";
 
 	let { data } = $props();
 
@@ -139,12 +139,16 @@
 	</article>
 </section>
 <footer>
-	<LoadButton onclick={() => fetch("/api/createRepos", { method: "POST" })}>
-		Запустить создание репозиториев
-	</LoadButton>
-	<LoadButton onclick={() => fetch("/api/checkIssues", { method: "POST" })}
-		>Запустить сбор ДЗ
-	</LoadButton>
+	{#if enabledFeatures.createRepos}
+		<LoadButton onclick={() => fetch("/api/createRepos", { method: "POST" })}>
+			Запустить создание репозиториев
+		</LoadButton>
+	{/if}
+	{#if enabledFeatures.watchIssues}
+		<LoadButton onclick={() => fetch("/api/checkIssues", { method: "POST" })}>
+			Запустить сбор ДЗ
+		</LoadButton>
+	{/if}
 </footer>
 
 <style lang="scss">
